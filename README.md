@@ -1,2 +1,3 @@
 # KotlinAndGo
-this project to implements my new skills in Kotlin as android development & GoLang as backend
+
+this project to implements my new skills in Kotlin Compose as android development & GoLang as backend
