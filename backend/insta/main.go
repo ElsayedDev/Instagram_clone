@@ -3,35 +3,13 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"insta/database_insta"
 
 	_ "github.com/lib/pq"
 )
 
-const (
-	host     = "localhost"
-	port     = 5432
-	user     = "postgres"
-	password = "1234"
-	dbname   = "test"
-)
-
 func main() {
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
-	fmt.Println(psqlInfo)
-
-	db, err := sql.Open("postgres", psqlInfo)
-
-	if err != nil {
-		fmt.Println(err)
-		panic(err)
-	}
-	defer db.Close()
-
-	// to create table
-	createTableInDb(db, err)
-
+	database_insta.DatabasePSQLConnection()
 }
 
 func insertInDB(db *sql.DB, err error) {
@@ -52,17 +30,6 @@ func insertInDB(db *sql.DB, err error) {
 	}
 
 	fmt.Println("New record ID is:", id)
-}
-
-func createTableInDb(db *sql.DB, err error) {
-	sqlStatement := `CREATE TABLE users (id SERIAL PRIMARY KEY, age INT, email TEXT, first_name TEXT, last_name TEXT)`
-	_, err = db.Exec(sqlStatement)
-
-	if err != nil {
-		fmt.Println(err)
-		panic(err)
-	}
-	fmt.Println("Table has created successfully")
 }
 
 func selectFromDb(db *sql.DB, err error) {
