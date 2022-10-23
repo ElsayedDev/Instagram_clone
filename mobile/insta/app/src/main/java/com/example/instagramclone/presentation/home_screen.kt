@@ -1,8 +1,6 @@
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.horizontalScroll
+import android.util.Log
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 
@@ -16,17 +14,41 @@ import com.example.instagramclone.R
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
+
+import kotlinx.coroutines.launch
+
+import  androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.flow.*
+
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    viewModel: SnackBarScreenViewModel = viewModel()
+) {
 
 
+    val scaffoldState = rememberScaffoldState()
+
+    LaunchedEffect(Unit) {
+        viewModel.isMessageShownFlow.collectLatest {
+            if (it) {
+                scaffoldState.snackbarHostState.showSnackbar(
+                    message = "Hello World",
+                    duration = SnackbarDuration.Short
+                )
+            }
+        }
+    }
     Scaffold(
+        scaffoldState = scaffoldState,
         topBar = {
 
             TopAppBar(
@@ -67,20 +89,24 @@ fun HomeScreen() {
                 )
 
         }
-    ) {
-//        Text(text = "Home Screen")
-        InstaStatus()
+    ) { contentPadding ->
+        InstaStatus(
+            modifier = Modifier
+                .padding(contentPadding)
+                .fillMaxSize()
+
+        )
     }
 
 }
 
 @Composable
-fun InstaStatus() {
-    val listData = listOf<Int>(1, 2, 4, 6, 5, 5)
+fun InstaStatus(modifier: Modifier = Modifier) {
+    val listData = listOf(1, 2, 3, 4, 5, 6, 7 , 8, 9, 10)
 
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .padding(10.dp)
     ) {
 
@@ -91,9 +117,12 @@ fun InstaStatus() {
         ) {
 
             listData.forEach { index ->
-                val imageUrl = "https://source.unsplash.com/random/52$index/?face"
+                val imageUrl = "https://source.unsplash.com/random/53$index/?face"
 
-                StatusBox(imageUrl = imageUrl)
+                StatusBox(
+                    imageUrl = imageUrl,
+                    title = "Tile $index",
+                )
             }
         }
     }
@@ -101,7 +130,14 @@ fun InstaStatus() {
 }
 
 @Composable
-fun StatusBox(shape: Shape = CircleShape, imageUrl : String) {
+fun StatusBox(
+    shape: Shape = CircleShape,
+
+    imageUrl: String,
+    title: String,
+    viewModel: SnackBarScreenViewModel = viewModel()
+) {
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -110,23 +146,56 @@ fun StatusBox(shape: Shape = CircleShape, imageUrl : String) {
 
         Box(
             modifier = Modifier
-                .size(120.dp)
                 .padding(4.dp)
-                .clip(shape)
 
-        ){
-    Column {
-        AsyncImage(
-            model =imageUrl ,
-            contentDescription = "Image",
-            contentScale = ContentScale.Crop,
+        ) {
+            Column(
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                val colors = listOf(Color(0xFFFBAA47), Color(0xFFD91A46), Color(0xFFA60F93))
 
-            )
+                AsyncImage(
+                    model = imageUrl,
+                    contentDescription = "Image",
+                    contentScale = ContentScale.Crop,
+                    placeholder = painterResource(id = R.drawable.ic_launcher_background),
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(shape)
+                        .border(
+                            width = 3.dp,
+                            brush = Brush.horizontalGradient(colors = colors),
+                            shape = shape,
+                        )
+                        .clickable {
+                            // log the click
+                            Log.v("StatusBox", "Clicked on $title")
+                            viewModel.setMessageShown()
+                        }
 
-        Text(text = "Name")
-    }
+                )
+
+                Text(text = title)
+            }
 
         }
+    }
+}
+
+
+class SnackBarScreenViewModel(
+) : ViewModel() {
+
+    private val _isMessageShown = MutableSharedFlow<Boolean>()
+    val isMessageShownFlow = _isMessageShown.asSharedFlow()
+
+    fun setMessageShown() {
+        viewModelScope.launch {
+            _isMessageShown.emit(true)
+        }
+
+
     }
 }
 

@@ -1,9 +1,13 @@
 <component name="libraryTable">
   <library name="Gradle: com.google.accompanist:accompanist-systemuicontroller:0.17.0@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/be718981e2baa48b4b9c4e263f41ca32/transformed/accompanist-systemuicontroller-0.17.0/jars/classes.jar!/" />
       <root url="file://$USER_HOME$/.gradle/caches/transforms-3/be718981e2baa48b4b9c4e263f41ca32/transformed/accompanist-systemuicontroller-0.17.0/res" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/be718981e2baa48b4b9c4e263f41ca32/transformed/accompanist-systemuicontroller-0.17.0/AndroidManifest.xml" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/98d430cac428851fa9517b185ff6e658/transformed/accompanist-systemuicontroller-0.17.0/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/b977c7be1f6ed81a9ec23cfe5ebb7e0a/transformed/accompanist-systemuicontroller-0.17.0/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/df3b5aec5f3d73518e084ace269b689f/transformed/accompanist-systemuicontroller-0.17.0/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/5a060e20ef8a9a4ff86fe1c189bb755a/transformed/accompanist-systemuicontroller-0.17.0/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/5a060e20ef8a9a4ff86fe1c189bb755a/transformed/accompanist-systemuicontroller-0.17.0/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/5a060e20ef8a9a4ff86fe1c189bb755a/transformed/accompanist-systemuicontroller-0.17.0/res" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.accompanist/accompanist-systemuicontroller/0.17.0/273d046e342b696ec63fd0583a0ad7806d4015ba/accompanist-systemuicontroller-0.17.0-javadoc.jar!/" />
