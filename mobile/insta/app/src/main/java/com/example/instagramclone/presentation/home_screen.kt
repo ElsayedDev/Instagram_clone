@@ -17,15 +17,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImage
 
-import kotlinx.coroutines.launch
-
 import  androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.instagramclone.presentation.SnackBarScreenViewModel
 import kotlinx.coroutines.flow.*
 
 
@@ -41,7 +38,7 @@ fun HomeScreen(
         viewModel.isMessageShownFlow.collectLatest {
             if (it) {
                 scaffoldState.snackbarHostState.showSnackbar(
-                    message = "Hello World",
+                    message = viewModel.message,
                     duration = SnackbarDuration.Short
                 )
             }
@@ -90,47 +87,42 @@ fun HomeScreen(
 
         }
     ) { contentPadding ->
-        InstaStatus(
+        Column(
             modifier = Modifier
                 .padding(contentPadding)
                 .fillMaxSize()
+        ) {
+            InstaStatus()
 
+            PostWidget(
+                modifier = Modifier
+                    .padding(contentPadding)
+                    .fillMaxSize()
+            )
+        }
+
+    }
+
+}
+
+
+@Composable
+fun PostWidget(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .padding(10.dp)
+    ) {
+
+        PostBox(
+            imageUrl = "https://source.unsplash.com/random/53/?face",
+            title = "Tile 1",
         )
     }
 
 }
 
 @Composable
-fun InstaStatus(modifier: Modifier = Modifier) {
-    val listData = listOf(1, 2, 3, 4, 5, 6, 7 , 8, 9, 10)
-
-
-    Box(
-        modifier = modifier
-            .padding(10.dp)
-    ) {
-
-        Row(
-            modifier = Modifier
-                .horizontalScroll(rememberScrollState())
-                .fillMaxWidth()
-        ) {
-
-            listData.forEach { index ->
-                val imageUrl = "https://source.unsplash.com/random/53$index/?face"
-
-                StatusBox(
-                    imageUrl = imageUrl,
-                    title = "Tile $index",
-                )
-            }
-        }
-    }
-
-}
-
-@Composable
-fun StatusBox(
+fun PostBox(
     shape: Shape = CircleShape,
 
     imageUrl: String,
@@ -138,64 +130,6 @@ fun StatusBox(
     viewModel: SnackBarScreenViewModel = viewModel()
 ) {
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentSize(Alignment.Center)
-    ) {
 
-        Box(
-            modifier = Modifier
-                .padding(4.dp)
 
-        ) {
-            Column(
-                verticalArrangement = Arrangement.SpaceBetween,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                val colors = listOf(Color(0xFFFBAA47), Color(0xFFD91A46), Color(0xFFA60F93))
-
-                AsyncImage(
-                    model = imageUrl,
-                    contentDescription = "Image",
-                    contentScale = ContentScale.Crop,
-                    placeholder = painterResource(id = R.drawable.ic_launcher_background),
-                    modifier = Modifier
-                        .size(80.dp)
-                        .clip(shape)
-                        .border(
-                            width = 3.dp,
-                            brush = Brush.horizontalGradient(colors = colors),
-                            shape = shape,
-                        )
-                        .clickable {
-                            // log the click
-                            Log.v("StatusBox", "Clicked on $title")
-                            viewModel.setMessageShown()
-                        }
-
-                )
-
-                Text(text = title)
-            }
-
-        }
-    }
 }
-
-
-class SnackBarScreenViewModel(
-) : ViewModel() {
-
-    private val _isMessageShown = MutableSharedFlow<Boolean>()
-    val isMessageShownFlow = _isMessageShown.asSharedFlow()
-
-    fun setMessageShown() {
-        viewModelScope.launch {
-            _isMessageShown.emit(true)
-        }
-
-
-    }
-}
-
