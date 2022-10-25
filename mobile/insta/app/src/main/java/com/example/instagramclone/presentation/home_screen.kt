@@ -1,4 +1,3 @@
-import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -14,11 +13,8 @@ import com.example.instagramclone.R
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImage
 
 import  androidx.lifecycle.viewmodel.compose.viewModel
@@ -91,6 +87,8 @@ fun HomeScreen(
             modifier = Modifier
                 .padding(contentPadding)
                 .fillMaxSize()
+
+                .verticalScroll(rememberScrollState())
         ) {
             InstaStatus()
 
@@ -110,11 +108,11 @@ fun HomeScreen(
 fun PostWidget(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
-            .padding(10.dp)
+//            .padding(10.dp)
     ) {
 
         PostBox(
-            imageUrl = "https://source.unsplash.com/random/53/?face",
+            imageUrl = "https://source.unsplash.com/random/536/?face",
             title = "Tile 1",
         )
     }
@@ -123,13 +121,115 @@ fun PostWidget(modifier: Modifier = Modifier) {
 
 @Composable
 fun PostBox(
-    shape: Shape = CircleShape,
 
     imageUrl: String,
     title: String,
     viewModel: SnackBarScreenViewModel = viewModel()
 ) {
 
+    // container of the post
+    Card(
 
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                viewModel.showSnackBarMessage("Clicked on $title")
+            }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
+
+        ) {
+            // post header
+            Box (
+                modifier = Modifier
+                    .background(color = Color.Cyan)
+                    .fillMaxWidth()
+
+                    ){
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(4.dp)
+
+                ) {
+                    // profile image
+                    Box(
+                        modifier = Modifier
+                            .size(50.dp)
+                            .clip(CircleShape)
+                    ) {
+                        AsyncImage(
+                            model = imageUrl,
+                            contentDescription = "Profile Image",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(CircleShape)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.size(10.dp))
+
+                    // profile name
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.h6
+                    )
+                }
+            }
+
+            // post image
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                AsyncImage(
+                    model = imageUrl,
+                    contentDescription = "Post Image",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+//                        .height(300.dp)
+                )
+            }
+
+            // post footer
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp)
+            ) {
+                // like button
+                IconButton(onClick = { }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.insta_camera_inco),
+                        contentDescription = "Like",
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+
+                // comment button
+                IconButton(onClick = { }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.insta_camera_inco),
+                        contentDescription = "Comment",
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+
+                // share button
+                IconButton(onClick = { }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.insta_camera_inco),
+                        contentDescription = "Share",
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            }
+        }
+    }
 
 }

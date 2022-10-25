@@ -92,7 +92,7 @@ fun StatusBox(
                         .clickable {
                             // log the click
                             Log.v("StatusBox", "Clicked on $title")
-                            viewModel.setMessageShown("status with $title clicked")
+                            viewModel.showSnackBarMessage("status with $title clicked")
                         }
 
                 )

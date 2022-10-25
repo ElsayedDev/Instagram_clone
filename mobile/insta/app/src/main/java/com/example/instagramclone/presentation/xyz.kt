@@ -13,7 +13,7 @@ class SnackBarScreenViewModel : ViewModel() {
 
      var message: String = ""
 
-    fun setMessageShown(message: String) {
+    fun showSnackBarMessage(message: String) {
         this.message = message
         viewModelScope.launch {
             _isMessageShown.emit(true)
