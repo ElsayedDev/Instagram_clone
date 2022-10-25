@@ -18,6 +18,8 @@ import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 
 import  androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.instagramclone.presentation.SnackBarScreenViewModel
 import kotlinx.coroutines.flow.*
 
@@ -147,6 +149,7 @@ fun PostBox(
                 modifier = Modifier
                     .background(color = Color.Cyan)
                     .fillMaxWidth()
+                    .align(Alignment.CenterHorizontally)
 
                     ){
                 Row(
@@ -232,4 +235,51 @@ fun PostBox(
         }
     }
 
+}
+
+
+sealed class BottomNavItem(var title: String, var icon: Int, var route: String) {
+    object Home : BottomNavItem( "Home", R.drawable.insta_camera_inco, "home")
+    object Search : BottomNavItem( "Search", R.drawable.insta_camera_inco, "search")
+    object Add : BottomNavItem( "Add", R.drawable.insta_camera_inco, "add")
+    object Likes : BottomNavItem( "Likes", R.drawable.insta_camera_inco, "likes")
+    object Profile : BottomNavItem( "Profile", R.drawable.insta_camera_inco, "profile")
+}
+
+@Composable
+fun BottomNavigation(navController : NavController){
+    val items = listOf(
+        BottomNavItem.Home,
+        BottomNavItem.Search,
+        BottomNavItem.Add,
+        BottomNavItem.Likes,
+        BottomNavItem.Profile
+    )
+    androidx.compose.material.BottomNavigation(
+        backgroundColor = Color.White,
+        contentColor = Color.Black,
+        elevation = 12.dp
+    ) {
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentRoute = navBackStackEntry?.arguments?.getString(KEY_ROUTE)
+        items.forEach { screen ->
+            BottomNavigationItem(
+                icon = {
+                    Icon(
+                        painter = painterResource(id = screen.icon),
+                        contentDescription = screen.title,
+                        modifier = Modifier.size(24.dp)
+                    )
+                },
+                label = { Text(text = screen.title) },
+                selected = currentRoute == screen.route,
+                onClick = {
+                    navController.navigate(screen.route) {
+                        popUpTo = navController.graph.startDestination
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+    }
 }
