@@ -1,4 +1,7 @@
 import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.gestures.rememberTransformableState
+import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
@@ -14,12 +17,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 
 import  androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.example.instagramclone.presentation.SnackBarScreenViewModel
 import kotlinx.coroutines.flow.*
 
@@ -31,6 +39,8 @@ fun HomeScreen(
 
 
     val scaffoldState = rememberScaffoldState()
+    val navController = rememberNavController()
+
 
     LaunchedEffect(Unit) {
         viewModel.isMessageShownFlow.collectLatest {
@@ -83,7 +93,8 @@ fun HomeScreen(
 
                 )
 
-        }
+        },
+        bottomBar = { BottomNavigation(navController) }
     ) { contentPadding ->
         Column(
             modifier = Modifier
@@ -114,7 +125,7 @@ fun PostWidget(modifier: Modifier = Modifier) {
     ) {
 
         PostBox(
-            imageUrl = "https://source.unsplash.com/random/536/?face",
+            imageUrl = "https://source.unsplash.com/random/506/?face",
             title = "Tile 1",
         )
     }
@@ -145,59 +156,40 @@ fun PostBox(
 
         ) {
             // post header
-            Box (
+            Row(
                 modifier = Modifier
-                    .background(color = Color.Cyan)
                     .fillMaxWidth()
-                    .align(Alignment.CenterHorizontally)
+                    .padding(4.dp),
+                verticalAlignment = Alignment.CenterVertically
 
-                    ){
-                Row(
+            ) {
+                // profile image
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(4.dp)
-
+                        .size(50.dp)
+                        .clip(CircleShape),
                 ) {
-                    // profile image
-                    Box(
+                    AsyncImage(
+                        model = imageUrl,
+                        contentDescription = "Profile Image",
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier
-                            .size(50.dp)
+                            .fillMaxSize()
                             .clip(CircleShape)
-                    ) {
-                        AsyncImage(
-                            model = imageUrl,
-                            contentDescription = "Profile Image",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(CircleShape)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.size(10.dp))
-
-                    // profile name
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.h6
                     )
                 }
-            }
 
-            // post image
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                AsyncImage(
-                    model = imageUrl,
-                    contentDescription = "Post Image",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxWidth()
-//                        .height(300.dp)
+                Spacer(modifier = Modifier.size(10.dp))
+
+                // profile name
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.h6
                 )
             }
+
+
+            ImagePreviewWidget( imageUrl = imageUrl)
 
             // post footer
             Row(
@@ -238,48 +230,45 @@ fun PostBox(
 }
 
 
-sealed class BottomNavItem(var title: String, var icon: Int, var route: String) {
-    object Home : BottomNavItem( "Home", R.drawable.insta_camera_inco, "home")
-    object Search : BottomNavItem( "Search", R.drawable.insta_camera_inco, "search")
-    object Add : BottomNavItem( "Add", R.drawable.insta_camera_inco, "add")
-    object Likes : BottomNavItem( "Likes", R.drawable.insta_camera_inco, "likes")
-    object Profile : BottomNavItem( "Profile", R.drawable.insta_camera_inco, "profile")
-}
-
 @Composable
-fun BottomNavigation(navController : NavController){
-    val items = listOf(
-        BottomNavItem.Home,
-        BottomNavItem.Search,
-        BottomNavItem.Add,
-        BottomNavItem.Likes,
-        BottomNavItem.Profile
-    )
-    androidx.compose.material.BottomNavigation(
-        backgroundColor = Color.White,
-        contentColor = Color.Black,
-        elevation = 12.dp
-    ) {
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentRoute = navBackStackEntry?.arguments?.getString(KEY_ROUTE)
-        items.forEach { screen ->
-            BottomNavigationItem(
-                icon = {
-                    Icon(
-                        painter = painterResource(id = screen.icon),
-                        contentDescription = screen.title,
-                        modifier = Modifier.size(24.dp)
-                    )
-                },
-                label = { Text(text = screen.title) },
-                selected = currentRoute == screen.route,
-                onClick = {
-                    navController.navigate(screen.route) {
-                        popUpTo = navController.graph.startDestination
-                        launchSingleTop = true
-                    }
-                }
-            )
+fun ImagePreviewWidget(
+    imageUrl : String
+){
+    var scale by remember { mutableStateOf(1f) }
+    val state = rememberTransformableState { zoomChange, _, _ ->
+        scale *= zoomChange
+        if(scale < 1){
+            scale = 1F
         }
+    }
+
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .graphicsLayer(
+                scaleX = scale,
+                scaleY = scale
+            )
+            .transformable(state = state)
+//            .pointerInput(Unit) {
+//                detectTransformGestures { _, _, zoom, _ ->
+//                    scale = when {
+//                        scale < 0.5f -> 0.5f
+//                        scale > 3f -> 3f
+//                        else -> scale * zoom
+//                    }
+//                }
+//            }
+    ) {
+
+        AsyncImage(
+            model = imageUrl,
+            contentDescription = "Post Image",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .fillMaxWidth()
+//                        .height(300.dp)
+        )
     }
 }
